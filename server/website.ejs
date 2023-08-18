@@ -11,6 +11,7 @@
     overflow: hidden; 
   }
   img {
+    user-select: none;
     border: none;
     width: 100%; 
     height: 100%; 
@@ -80,17 +81,25 @@ socket.on('adminmessagec', data => {
 
 });
 
-
-
-
-document.getElementById('screenshotImg').addEventListener("click",function(event){
-    socket.emit("adminmessage",{ machine:machine,click:[event.clientX,event.clientY,"left"]})
+document.getElementById('screenshotImg').addEventListener("mouseup",function(event){
+  event.preventDefault();
+  var type = ""
+  if (event.button === 0) type = "left"
+  if (event.button === 1) type = "middle"
+  if (event.button === 2) type = "right"
+  socket.emit("adminmessage",{ machine:machine,mouseup:type})
 })
 document.getElementById('screenshotImg').addEventListener("contextmenu",function(event){
-    socket.emit("adminmessage",{ machine:machine,click:[event.clientX,event.clientY,'right']})
+  event.preventDefault();
 })
 document.getElementById('screenshotImg').addEventListener("mousedown",function(event){
-  if (event.button === 1) { socket.emit("adminmessage",{ machine:machine,click:[event.clientX,event.clientY,'middle']})}
+  event.preventDefault();
+  var type = ""
+  if (event.button === 0) type = "left"
+  if (event.button === 1) type = "middle"
+  if (event.button === 2) type = "right"
+  console.log(type)
+  socket.emit("adminmessage",{ machine:machine,mousedown:[event.clientX,event.clientY,type]})
 })
 document.getElementById('screenshotImg').addEventListener("wheel", function(event) {
   socket.emit("adminmessage",{ machine:machine,scroll:event.deltaY})
