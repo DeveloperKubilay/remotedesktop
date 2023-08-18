@@ -20,33 +20,60 @@
 <body>
     <script>
       var process = {}
+      var autoq = true;
+      var ping = 0
+      var quality = 100
       var interval = ""
+      var machine = "<%= machine %>"
       function startstream(){}
       document.addEventListener("DOMContentLoaded", function() {
-  var machine = "<%= machine %>"
 const socket = io({
     auth:{auth:"a1"}
 });
 
 var mousemove = false;
 
-startstream = function(x){
+startstream = function(x,c){
+  if(c){
+    autoq = false;
+    socket.emit("adminmessage",{
+    machine:machine,
+    quality:Number(x)
+  });
+  }else{
 clearInterval(interval);
 interval = setInterval(()=>{
+  if(autoq){
+    if(ping > 1000) quality -= 1 
+    if(ping < 500) quality += 1 
+    console.log(ping < 500,quality)
+
+    if(quality < 0) quality = 1
+    socket.emit("adminmessage",{
+    machine:machine,
+    quality:quality
+  });
+  }
   socket.emit("adminmessage",{
     machine:machine,
-    screenshot:true
+    screenshot:true,
+    time:Date.now()
   });
 },x || 100)
+}
 }
 startstream()
 
 socket.on('adminmessagec', data => {
+  if(data.machine != machine) return;
   if(data.screenshot){
     const base64Data = data.screenshot;
     const blob = new Blob([base64Data], { type: 'image/png' });
     const imageUrl = URL.createObjectURL(blob);
     document.getElementById('screenshotImg').src = imageUrl;
+    ping = Date.now()-data.time
+    quality = data.quality
+    document.getElementById("pingg").innerHTML = "Ping:"+ping+"ms"
   }
   if(data.process){
     process = data.process
@@ -115,5 +142,7 @@ document.getElementById('movemousea').addEventListener("click",function(event){m
   <button style="top:0;left:140px;position: absolute;" id="movemousea" >Movemouse</button>
   <button style="top:0;left:240px;position: absolute;" onclick="navigator.clipboard.writeText(JSON.stringify(process,null,2))" >Copy process</button>
   <button style="top:0;left:350px;position: absolute;" onclick="startstream(prompt('FPS:'))" >Restream</button>
+  <button style="top:0;left:450px;position: absolute;" onclick="startstream(prompt('0 to 100:'),'q')" >Quality</button>
+  <a style="top:0;left:550px;position: absolute;color:red" id="pingg" >Ping</a>
 </body>
 </html>
