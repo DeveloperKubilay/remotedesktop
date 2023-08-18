@@ -1,10 +1,12 @@
+var machine = "cli1"
+var ipaddr = "http://localhost:3000/"
+
 const io = require('socket.io-client');
 const screenshot = require('screenshot-desktop')
 const fs = require("fs")
 const exec = require("child_process").exec
 var kill = require('tree-kill');
-var machine = "cli1"
-const socket = io('http://localhost:3000',{
+const socket = io(ipaddr,{
     auth:{auth:machine}
 });
 var pid = 0
