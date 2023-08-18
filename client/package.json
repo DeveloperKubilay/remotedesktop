@@ -1,0 +1,19 @@
+{
+    "name": "rdclient",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "start": "node index.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+      "@jitsi/robotjs": "^0.6.13",
+      "socket.io-client": "^4.7.2",
+      "tree-kill": "^1.15.0",
+      "screenshot-desktop":"^1.15.0"
+    }
+  }
