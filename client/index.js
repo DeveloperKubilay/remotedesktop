@@ -27,7 +27,6 @@ console.log("connected")
                 socket.emit('clientMessage', {
                     screenshot:outputBuffer,
                     time:data.time,
-                    quality:quality,
                     process:process.env
                 });
             })
