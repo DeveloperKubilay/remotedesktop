@@ -46,7 +46,6 @@ interval = setInterval(()=>{
   if(autoq){
     if(ping > 1000) quality -= 1 
     if(ping < 500) quality += 1 
-    console.log(ping < 500,quality)
 
     if(quality < 0) quality = 1
     socket.emit("adminmessage",{
