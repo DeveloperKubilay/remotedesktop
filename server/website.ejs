@@ -43,7 +43,10 @@ startstream()
 
 socket.on('adminmessagec', data => {
   if(data.screenshot){
-    document.getElementById('screenshotImg').src = 'data:image/png;base64,' + data.screenshot
+    const base64Data = data.screenshot;
+    const blob = new Blob([base64Data], { type: 'image/png' });
+    const imageUrl = URL.createObjectURL(blob);
+    document.getElementById('screenshotImg').src = imageUrl;
   }
   if(data.process){
     process = data.process
