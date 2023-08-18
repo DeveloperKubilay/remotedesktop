@@ -19,6 +19,7 @@ console.log("connected")
   
   socket.on('message', (data) => {
     if(data.machine !=machine) return;
+    console.log(data)
     if(data.quality){quality = data.quality}
     if(data.screenshot){
         screenshot({format: 'png'}).then((img) => {
@@ -40,13 +41,18 @@ console.log("connected")
        try{
     require("@jitsi/robotjs").keyTap(data.keypress);
        }catch{}
-    }else if(data.click){
+    }else if(data.mousedown){
         try{
          var robot = require("@jitsi/robotjs");
-    robot.moveMouse(data.click[0],data.click[1]);
-    robot.mouseClick(data.click[2]);
-        }catch{}
-    }else if(data.move){
+         robot.moveMouse(data.mousedown[0],data.mousedown[1]);
+         robot.mouseToggle("down",data.mousedown[2]);
+        }catch {}
+    }else if(data.mouseup){
+      try{
+       var robot = require("@jitsi/robotjs");
+       robot.mouseToggle("up",data.mouseup);
+      }catch{}
+  }else if(data.move){
         try{
          var robot = require("@jitsi/robotjs");
     robot.moveMouse(data.move[0],data.move[1]);
@@ -58,3 +64,4 @@ console.log("connected")
         }catch{}
      }
   });
+  
