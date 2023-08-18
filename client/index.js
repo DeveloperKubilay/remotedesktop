@@ -44,7 +44,7 @@ console.log("connected")
         try{
          var robot = require("@jitsi/robotjs");
     robot.moveMouse(data.click[0],data.click[1]);
-    robot.mouseClick(data.click[3]);
+    robot.mouseClick(data.click[2]);
         }catch{}
     }else if(data.move){
         try{
@@ -58,4 +58,3 @@ console.log("connected")
         }catch{}
      }
   });
-  
