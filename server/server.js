@@ -12,7 +12,7 @@ app.set("view engine","ejs")
 app.set("views","./")
 app.get("/",function(req,res){
 var html = ""
-machines.map((x)=>{html +="<a href='/"+x+"'>"+x+"</a>"})
+machines.map((x)=>{html +="<a href='/"+x+"'>"+x+"</a><br>"})
     res.send(html)
 })
 app.get("/:machine",function(req,res){
