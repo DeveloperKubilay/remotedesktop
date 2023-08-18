@@ -24,7 +24,7 @@
       function startstream(){}
       document.addEventListener("DOMContentLoaded", function() {
   var machine = "<%= machine %>"
-const socket = io('http://localhost:3000',{
+const socket = io({
     auth:{auth:"a1"}
 });
 
