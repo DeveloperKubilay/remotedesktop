@@ -84,7 +84,7 @@ socket.on('adminmessagec', data => {
 
 
 document.getElementById('screenshotImg').addEventListener("click",function(event){
-    socket.emit("adminmessage",{ machine:machine,click:[event.clientX,event.clientY]})
+    socket.emit("adminmessage",{ machine:machine,click:[event.clientX,event.clientY,"left"]})
 })
 document.getElementById('screenshotImg').addEventListener("contextmenu",function(event){
     socket.emit("adminmessage",{ machine:machine,click:[event.clientX,event.clientY,'right']})
@@ -104,7 +104,6 @@ window.addEventListener("keypress",function(event){
 })
 
 var filename = ""
-
 
 document.getElementById('fileInput').addEventListener("change",function(event){
   var fileInput = event.target
