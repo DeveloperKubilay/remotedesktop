@@ -21,8 +21,8 @@
     <script>
       var process = {}
       var autoq = true;
-      var ping = 0
-      var quality = 100
+      var ping = 10000000
+      var quality = 1
       var interval = ""
       var machine = "<%= machine %>"
       function startstream(){}
@@ -45,9 +45,9 @@ clearInterval(interval);
 interval = setInterval(()=>{
   if(autoq){
     if(ping > 1000) quality -= 1 
-    if(ping < 500) quality += 1 
-
+    if(ping < 400) quality += 1 
     if(quality < 0) quality = 1
+    if(quality > 100) quality = 100
     socket.emit("adminmessage",{
     machine:machine,
     quality:quality
@@ -58,7 +58,7 @@ interval = setInterval(()=>{
     screenshot:true,
     time:Date.now()
   });
-},x || 100)
+},x || 250)
 }
 }
 startstream()
@@ -71,7 +71,6 @@ socket.on('adminmessagec', data => {
     const imageUrl = URL.createObjectURL(blob);
     document.getElementById('screenshotImg').src = imageUrl;
     ping = Date.now()-data.time
-    quality = data.quality
     document.getElementById("pingg").innerHTML = "Ping:"+ping+"ms"
   }
   if(data.process){
