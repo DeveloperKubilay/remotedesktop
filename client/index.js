@@ -19,7 +19,6 @@ console.log("connected")
   
   socket.on('message', (data) => {
     if(data.machine !=machine) return;
-    console.log(data)
     if(data.quality){quality = data.quality}
     if(data.screenshot){
         screenshot({format: 'png'}).then((img) => {
