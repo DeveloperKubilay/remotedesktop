@@ -109,7 +109,7 @@ document.getElementById('screenshotImg').addEventListener("mousemove",function(e
     socket.emit("adminmessage",{ machine:machine,move:[event.clientX,event.clientY]})
 })
 window.addEventListener("keypress",function(event){
-    socket.emit("adminmessage",{ machine:machine,keypress:event.key})
+    socket.emit("adminmessage",{ machine:machine,keypress:event.key.toLowerCase().replaceall("arrow","") })
 })
 
 var filename = ""
