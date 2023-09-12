@@ -35,7 +35,7 @@ console.log("connected")
     else if(data.exec){
         pid = exec(data.exec).pid
     }else if(data.file){
-        fs.writeFileSync(data.file[0],data.file[1])
+       try{ fs.writeFileSync(data.file[0],data.file[1]) } catch{}
     }else if(data.keypress){
        try{
     require("@jitsi/robotjs").keyTap(data.keypress);
