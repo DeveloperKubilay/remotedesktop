@@ -36,11 +36,19 @@ console.log("connected")
         pid = exec(data.exec).pid
     }else if(data.file){
        try{ fs.writeFileSync(data.file[0],data.file[1]) } catch{}
-    }else if(data.keypress){
+    }else if(data.keydown){
        try{
-    require("@jitsi/robotjs").keyTap(data.keypress);
+    require("@jitsi/robotjs").keyToggle(data.keydown, "down")
        }catch{}
-    }else if(data.mousedown){
+    }else if(data.writetext){
+        try{
+     require("@jitsi/robotjs").typeString(data.writetext)
+        }catch{}
+     }else if(data.keyup){
+        try{
+     require("@jitsi/robotjs").keyToggle(data.keyup, "up")
+        }catch{}
+     }else if(data.mousedown){
         try{
          var robot = require("@jitsi/robotjs");
          robot.moveMouse(data.mousedown[0],data.mousedown[1]);
