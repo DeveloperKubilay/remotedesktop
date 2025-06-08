@@ -1,6 +1,6 @@
 # Remote Desktop Control App 🖥️🔥
 
-![Remote Desktop Control App Screenshot](https://i.imgur.com/h2m5lrk.png)
+![Remote Desktop Control App Screenshot](https://raw.githubusercontent.com/DeveloperKubilay/remotedesktop/refs/heads/main/example.png)
 
 No cap, this app is straight fire for controlling computers remotely! Built with Node.js and Socket.io for that real-time connection vibes. ✨
 
